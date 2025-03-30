@@ -39,31 +39,67 @@ class Expenses {
 
 struct ContentView: View {
 	@State private var expenses = Expenses()
-	
+		
 	@State private var addNewExpense = false
 	
 	var body: some View {
 		NavigationStack {
 			List {
-				ForEach(expenses.items) { item in
-					HStack {
-						VStack (alignment: .leading) {
-							Text(item.name)
-								.font(.headline)
+				Section ("Personal") {
+					ForEach(expenses.items.filter{$0.type == "Personal"}) { item in
+						HStack {
+							VStack (alignment: .leading) {
+								Text(item.name)
+									.font(.headline)
+								
+								Text(item.type)
+							}
 							
-							Text(item.type)
+							Spacer()
+							
+							Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+								.foregroundStyle (expenseColor(amount: item.amount))
+								.font(.title2)
+								.fontWeight(expenseFontWeight(amount: item.amount))
+							
+							
 						}
 						
-						Spacer()
 						
-						Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
 						
 					}
-					
-					
-					
+					.onDelete(perform: deleteItem)
 				}
-				.onDelete(perform: deleteItem)
+				
+				Section ("Business") {
+					
+					ForEach(expenses.items.filter{$0.type == "Business"}) { item in
+						HStack {
+							VStack (alignment: .leading) {
+								Text(item.name)
+									.font(.headline)
+								
+								Text(item.type)
+							}
+							
+							Spacer()
+							
+							Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+								.foregroundStyle (expenseColor(amount: item.amount))
+								.font(.title2)
+								.fontWeight(expenseFontWeight(amount: item.amount))
+							
+							
+						}
+						
+						
+						
+					}
+					.onDelete(perform: deleteItem)
+						
+					
+						
+				}
 				
 			}
 			.navigationTitle("Expenses")
@@ -83,6 +119,26 @@ struct ContentView: View {
 		expenses.items.remove(atOffsets: offsets)
 		
 		
+	}
+	
+	func expenseColor(amount: Double) -> Color {
+		if amount <= 10 {
+			.green
+		} else if amount > 10 && amount < 999 {
+			.yellow
+		} else {
+			.red
+		}
+	}
+	
+	func expenseFontWeight(amount: Double) -> Font.Weight {
+		if amount <= 10 {
+			.regular
+		} else if amount > 10 && amount < 999 {
+			.medium
+		} else {
+			.semibold
+		}
 	}
 	
 }
